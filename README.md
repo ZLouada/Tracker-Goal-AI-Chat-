@@ -93,3 +93,5 @@ The built-in chat server located in `server/chat.ts` connects to Google Gemini 2
 - **createPlan**: Let the AI automatically draft a plan of tasks.
 - **listGoals**: Query the state of your active goals.
 - **controlTimer**: Start or stop your pomodoro/timers.
+
+
