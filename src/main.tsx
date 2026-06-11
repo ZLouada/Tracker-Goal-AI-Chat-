@@ -14,7 +14,12 @@ createRoot(document.getElementById("root")!).render(
   <ClerkProvider
     publishableKey={PUBLISHABLE_KEY}
     afterSignOutUrl="/"
-    appearance={{ theme: shadcn }}
+    appearance={{
+      theme: shadcn,
+      layout: {
+        logoImageUrl: "/logo.svg",
+      }
+    }}
   >
     <App />
   </ClerkProvider>

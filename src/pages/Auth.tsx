@@ -75,6 +75,9 @@ const Auth = () => {
               signUpUrl="/auth"
               forceRedirectUrl="/dashboard"
               appearance={{
+                layout: {
+                  logoImageUrl: "/logo.svg",
+                },
                 elements: {
                   rootBox: "w-full",
                   card: "shadow-none border border-border bg-card rounded-2xl",
@@ -98,6 +101,9 @@ const Auth = () => {
               signInUrl="/auth"
               forceRedirectUrl="/dashboard"
               appearance={{
+                layout: {
+                  logoImageUrl: "/logo.svg",
+                },
                 elements: {
                   rootBox: "w-full",
                   card: "shadow-none border border-border bg-card rounded-2xl",

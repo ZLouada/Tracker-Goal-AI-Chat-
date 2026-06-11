@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 import { handleChat } from "./chat.js";
 import { upload, handleFileUpload } from "./upload.js";
 
@@ -94,6 +96,25 @@ app.use((err: any, _req: any, res: any, next: any) => {
     return res.status(400).json({ error: "File too large. Maximum size is 20MB." });
   }
   next(err);
+});
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const distPath = path.resolve(__dirname, "../dist");
+
+// Serve static files from the Vite build directory
+app.use(express.static(distPath));
+
+// Fallback: serve index.html for all non-API requests (client-side routing)
+app.get("*", (req, res, next) => {
+  if (req.path.startsWith("/api")) {
+    return next();
+  }
+  res.sendFile(path.join(distPath, "index.html"), (err) => {
+    if (err) {
+      next();
+    }
+  });
 });
 
 app.listen(PORT, () => {
