@@ -106,9 +106,14 @@ app.use((err: any, _req: any, res: any, next: any) => {
   next(err);
 });
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const distPath = path.resolve(__dirname, "../dist");
+let currentDirname = "";
+try {
+  currentDirname = __dirname;
+} catch (e) {
+  const __filename = fileURLToPath(import.meta.url);
+  currentDirname = path.dirname(__filename);
+}
+const distPath = path.resolve(currentDirname, "../dist");
 
 // Serve static files from the Vite build directory
 app.use(express.static(distPath));

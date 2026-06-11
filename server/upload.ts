@@ -20,11 +20,11 @@ function getGenAI() {
 }
 
 // ─── Multer Configuration ───
-// Store uploaded files in a temp directory inside the project (use os.tmpdir for Vercel)
+// Store uploaded files in a temp directory (use os.tmpdir directly for Vercel to avoid folder creation permission issues)
 const UPLOAD_DIR = process.env.VERCEL
-  ? path.join(os.tmpdir(), "trackergoal-uploads")
+  ? os.tmpdir()
   : path.resolve("server/.uploads");
-if (!fs.existsSync(UPLOAD_DIR)) {
+if (!process.env.VERCEL && !fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }
 
