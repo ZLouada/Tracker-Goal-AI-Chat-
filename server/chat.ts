@@ -2,7 +2,18 @@ import { GoogleGenAI } from "@google/genai";
 import { tools, getSystemPrompt } from "./tools.js";
 import * as db from "./db.js";
 
-const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+let genaiInstance: any = null;
+
+function getGenAI() {
+  if (!genaiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("Missing GEMINI_API_KEY environment variable.");
+    }
+    genaiInstance = new GoogleGenAI({ apiKey });
+  }
+  return genaiInstance;
+}
 
 /**
  * The function dispatch map — maps Gemini function call names
@@ -57,7 +68,7 @@ export async function handleChat(
   });
 
   // Step 1: Send to Gemini with tools
-  const response = await genai.models.generateContent({
+  const response = await getGenAI().models.generateContent({
     model: "gemini-2.5-pro",
     contents,
     config: {
@@ -124,7 +135,7 @@ export async function handleChat(
     { role: "user", parts: functionResponses },
   ];
 
-  const finalResponse = await genai.models.generateContent({
+  const finalResponse = await getGenAI().models.generateContent({
     model: "gemini-2.5-pro",
     contents: followUp,
     config: {

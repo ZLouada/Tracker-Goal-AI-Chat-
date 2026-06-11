@@ -1,11 +1,20 @@
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL!;
-const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY!;
+let supabaseInstance: any = null;
 
-const supabase = createClient(supabaseUrl, supabaseKey, {
-  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-});
+function getSupabase() {
+  if (!supabaseInstance) {
+    const url = process.env.VITE_SUPABASE_URL;
+    const key = process.env.VITE_SUPABASE_ANON_KEY;
+    if (!url || !key) {
+      throw new Error("Missing VITE_SUPABASE_URL or VITE_SUPABASE_ANON_KEY environment variables.");
+    }
+    supabaseInstance = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+    });
+  }
+  return supabaseInstance;
+}
 
 // ─── Goals ───
 
@@ -21,7 +30,7 @@ export async function createGoal(
     target_date?: string;
   }
 ) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("goals")
     .insert({
       user_id: userId,
@@ -41,7 +50,7 @@ export async function createGoal(
 }
 
 export async function listGoals(userId: string, status: string = "active") {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("goals")
     .select("id, title, category, status, priority, target_minutes, target_date, color, created_at")
     .eq("user_id", userId)
@@ -65,7 +74,7 @@ export async function createTask(
     goal_id?: string;
   }
 ) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("tasks")
     .insert({
       user_id: userId,
@@ -138,7 +147,7 @@ export async function createPlan(
 }
 
 export async function updateGoalSummary(goalId: string, summaryText: string) {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from("goals")
     .update({ study_summary: summaryText })
     .eq("id", goalId)

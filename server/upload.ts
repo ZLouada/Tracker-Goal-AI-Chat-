@@ -6,7 +6,18 @@ import { GoogleGenAI } from "@google/genai";
 import { tools, getSystemPrompt, getFileAnalysisPrompt } from "./tools.js";
 import * as db from "./db.js";
 
-const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+let genaiInstance: any = null;
+
+function getGenAI() {
+  if (!genaiInstance) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("Missing GEMINI_API_KEY environment variable.");
+    }
+    genaiInstance = new GoogleGenAI({ apiKey });
+  }
+  return genaiInstance;
+}
 
 // ─── Multer Configuration ───
 // Store uploaded files in a temp directory inside the project (use os.tmpdir for Vercel)
@@ -93,7 +104,7 @@ export async function handleFileUpload(
     // ── Step 1: Upload the file to Google File API ──
     console.log(`[Upload] Uploading ${originalName} (${mimeType}) to Google...`);
 
-    const uploadResult = await genai.files.upload({
+    const uploadResult = await getGenAI().files.upload({
       file: filePath,
       config: {
         mimeType: mimeType,
@@ -122,7 +133,7 @@ export async function handleFileUpload(
     ];
 
     // ── Step 3: Send to Gemini with file analysis system prompt + tools ──
-    const response = await genai.models.generateContent({
+    const response = await getGenAI().models.generateContent({
       model: "gemini-2.5-pro",
       contents: [{ role: "user", parts: contentParts }],
       config: {
@@ -186,7 +197,7 @@ export async function handleFileUpload(
       { role: "user", parts: functionResponses },
     ];
 
-    const finalResponse = await genai.models.generateContent({
+    const finalResponse = await getGenAI().models.generateContent({
       model: "gemini-2.5-pro",
       contents: followUp,
       config: {
@@ -234,7 +245,7 @@ export async function handleFileUpload(
     // 2. Delete remote Google file
     if (googleFileName) {
       try {
-        await genai.files.delete({ name: googleFileName });
+        await getGenAI().files.delete({ name: googleFileName });
         console.log(`[Upload] Google file cleaned up: ${googleFileName}`);
       } catch (err: any) {
         console.warn(`[Upload] Failed to delete Google file: ${err.message}`);
