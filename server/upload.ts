@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import multer from "multer";
+import os from "os";
 import { GoogleGenAI } from "@google/genai";
 import { tools, getSystemPrompt, getFileAnalysisPrompt } from "./tools.js";
 import * as db from "./db.js";
@@ -8,8 +9,10 @@ import * as db from "./db.js";
 const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
 // ─── Multer Configuration ───
-// Store uploaded files in a temp directory inside the project
-const UPLOAD_DIR = path.resolve("server/.uploads");
+// Store uploaded files in a temp directory inside the project (use os.tmpdir for Vercel)
+const UPLOAD_DIR = process.env.VERCEL
+  ? path.join(os.tmpdir(), "trackergoal-uploads")
+  : path.resolve("server/.uploads");
 if (!fs.existsSync(UPLOAD_DIR)) {
   fs.mkdirSync(UPLOAD_DIR, { recursive: true });
 }

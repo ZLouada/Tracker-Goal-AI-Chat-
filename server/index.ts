@@ -106,7 +106,7 @@ const distPath = path.resolve(__dirname, "../dist");
 app.use(express.static(distPath));
 
 // Fallback: serve index.html for all non-API requests (client-side routing)
-app.get("*", (req, res, next) => {
+app.get(/.*/, (req, res, next) => {
   if (req.path.startsWith("/api")) {
     return next();
   }
@@ -117,8 +117,12 @@ app.get("*", (req, res, next) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`\n🤖 TrackerGoal AI Server running on http://localhost:${PORT}`);
-  console.log(`   Gemini API Key: ${process.env.GEMINI_API_KEY ? "✅ configured" : "❌ MISSING"}`);
-  console.log(`   Supabase URL:   ${process.env.VITE_SUPABASE_URL ? "✅ configured" : "❌ MISSING"}\n`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`\n🤖 TrackerGoal AI Server running on http://localhost:${PORT}`);
+    console.log(`   Gemini API Key: ${process.env.GEMINI_API_KEY ? "✅ configured" : "❌ MISSING"}`);
+    console.log(`   Supabase URL:   ${process.env.VITE_SUPABASE_URL ? "✅ configured" : "❌ MISSING"}\n`);
+  });
+}
+
+export default app;
