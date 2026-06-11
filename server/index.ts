@@ -9,6 +9,14 @@ import { upload, handleFileUpload } from "./upload.js";
 const app = express();
 const PORT = process.env.API_PORT || 3001;
 
+// Restore original URL path when rewritten by Vercel serverless proxy routing
+app.use((req, res, next) => {
+  if (req.originalUrl) {
+    req.url = req.originalUrl;
+  }
+  next();
+});
+
 app.use(cors({ origin: true }));
 app.use(express.json());
 
